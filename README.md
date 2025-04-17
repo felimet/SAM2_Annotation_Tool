@@ -42,7 +42,7 @@ pip install -e .
 #### 3. 下載模型權重
 
 預訓練權重可從以下途徑獲取：
-- 官方 HuggingFace 儲存庫：[https://huggingface.co/facebook/sam2](https://huggingface.co/facebook/sam2)
+- 官方 Github 儲存庫：[https://github.com/facebookresearch/sam2](https://github.com/facebookresearch/sam2#:~:text=or%20individually%20from%3A)
 - 或使用提供的下載腳本：
 
 ```bash

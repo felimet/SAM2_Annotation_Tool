@@ -580,7 +580,13 @@ class SAM2VideoPredictor(SAM2Base):
             )
             processing_order = range(start_frame_idx, end_frame_idx + 1)
 
-        for frame_idx in tqdm(processing_order, desc="propagate in video"):
+        # 停用 tqdm 進度條，使用簡單的打印
+        print(f"開始影片推導，總共 {len(processing_order)} 個畫格...")
+        for i, frame_idx in enumerate(processing_order):
+            # 每處理 10 個畫格報告一次進度
+            if i % 10 == 0 or i == len(processing_order) - 1:
+                print(f"正在處理畫格 {i+1}/{len(processing_order)} [畫格索引: {frame_idx}]")
+                
             pred_masks_per_obj = [None] * batch_size
             for obj_idx in range(batch_size):
                 obj_output_dict = inference_state["output_dict_per_obj"][obj_idx]
@@ -628,6 +634,8 @@ class SAM2VideoPredictor(SAM2Base):
                 inference_state, all_pred_masks
             )
             yield frame_idx, obj_ids, video_res_masks
+        
+        print("影片推導完成!")
 
     @torch.inference_mode()
     def clear_all_prompts_in_frame(

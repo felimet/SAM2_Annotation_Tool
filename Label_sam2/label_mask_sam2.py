@@ -100,9 +100,10 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
     save_dir = os.path.join(ann_frame_dir, "id_masks")
     os.makedirs(save_dir, exist_ok=True)
     
-    # 儲存物件ID遮罩
+    # 儲存物件ID遮罩，檔案命名從 1 開始，而不是從 0 開始
     mask_image = Image.fromarray(id_mask)
-    mask_path = os.path.join(save_dir, f"{ann_frame_idx:06d}.png")
+    # 將 frame_idx + 1 使命名從 1 開始
+    mask_path = os.path.join(save_dir, f"{(ann_frame_idx + 1):06d}.png")
     mask_image.save(mask_path)
     # print(f"已儲存ID遮罩至 {mask_path}")
     # print(f"遮罩中的物件ID值: {np.unique(id_mask)}")

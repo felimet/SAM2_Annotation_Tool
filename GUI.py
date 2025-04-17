@@ -21,6 +21,64 @@ def resource_path(relative_path):
     
     return os.path.join(base_path, relative_path)
 
+
+# --- 啟動畫面 ---
+def show_splash_screen():
+    """顯示啟動畫面並自動關閉"""
+    splash = tk.Toplevel()
+    splash.overrideredirect(True)  # 無邊框窗口
+    
+    # 獲取屏幕尺寸以便置中顯示
+    screen_width = splash.winfo_screenwidth()
+    screen_height = splash.winfo_screenheight()
+    
+    # 載入啟動圖像
+    img_path = resource_path(os.path.join("favicon_io", "android-chrome-512x512.png"))
+    try:
+        img = Image.open(img_path)
+        img = img.resize((300, 300))  # 調整到合適大小
+        splash_img = ImageTk.PhotoImage(img)
+        
+        # 設置窗口大小
+        width, height = 400, 400
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        splash.geometry(f"{width}x{height}+{x}+{y}")
+        
+        # 設置背景色
+        splash.configure(background='#1E3A8A')
+        
+        # 添加標誌圖像
+        img_label = tk.Label(splash, image=splash_img, bg='#1E3A8A')
+        img_label.place(relx=0.5, rely=0.45, anchor='center')
+        
+        # 添加標題
+        title_label = tk.Label(splash, text="SAM2 標註工具", font=("Arial", 18, "bold"), 
+                              fg='white', bg='#1E3A8A')
+        title_label.place(relx=0.5, rely=0.75, anchor='center')
+        
+        # 添加載入中文字
+        loading_label = tk.Label(splash, text="正在載入，請稍候...", font=("Arial", 10), 
+                               fg='white', bg='#1E3A8A')
+        loading_label.place(relx=0.5, rely=0.85, anchor='center')
+        
+        # 更新界面
+        splash.update()
+        
+        # 保持圖像引用
+        splash.img = splash_img
+        
+        # 設置在主窗口顯示後關閉啟動畫面
+        splash.after(3000, splash.destroy)
+        
+        return splash
+    except Exception as e:
+        print(f"啟動畫面加載失敗: {e}")
+        if splash.winfo_exists():
+            splash.destroy()
+        return None
+
+
 # --- 從原始腳本導入或重新定義必要的函數和設定 ---
 
 # 檢查並設定計算裝置
@@ -114,9 +172,10 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
         save_dir = os.path.join(ann_frame_dir, "id_masks")
         os.makedirs(save_dir, exist_ok=True)
 
-        # 儲存物件ID遮罩
+        # 儲存物件ID遮罩，檔案命名從 1 開始，而不是從 0 開始
         mask_image = Image.fromarray(id_mask)
-        mask_path = os.path.join(save_dir, f"{ann_frame_idx:06d}.png")
+        # 將 frame_idx + 1 使命名從 1 開始
+        mask_path = os.path.join(save_dir, f"{(ann_frame_idx + 1):06d}.png")
         mask_image.save(mask_path)
         # print(f"已儲存ID遮罩至 {mask_path}")
 
@@ -149,7 +208,7 @@ class SAM2_GUI(tk.Tk):
             value=resource_path(os.path.join("checkpoints", "sam2.1_hiera_large.pt")))  # 預設權重檔
         self.video_dir = tk.StringVar()
         self.output_dir = tk.StringVar(
-            value="D:/AnyCode/dataset/video_annotations")  # 預設輸出目錄
+            value="./video_annotations")  # 預設輸出目錄
         self.frame_names = []
         self.current_frame_index = tk.IntVar(value=0)
         self.predictor = None
@@ -1400,3 +1459,36 @@ if __name__ == "__main__":
     # --- 執行 GUI ---
     app = SAM2_GUI()
     app.mainloop()
+
+
+# --- 啟動應用程式 ---
+if __name__ == "__main__":
+    # --- 檢查相依性 ---
+    try:
+        import tkinter
+        import PIL
+        import matplotlib
+        try:
+            from sam2.build_sam import build_sam2_video_predictor
+        except ImportError:
+            messagebox.showerror("錯誤", "找不到 'sam2' 套件。請確保已正確安裝 SAM 2。")
+            sys.exit(0)
+    except ImportError as e:
+        messagebox.showerror(
+            "缺少相依性", f"缺少必要的 Python 函式庫: {e.name}。\n請安裝所需的函式庫 (Tkinter, Pillow, Matplotlib)。")
+        sys.exit(0)
+
+    # --- 顯示啟動畫面 ---
+    splash = show_splash_screen()
+    
+    # --- 執行 GUI ---
+    app = SAM2_GUI()
+    
+    # 確保啟動畫面關閉
+    if splash and splash.winfo_exists():
+        splash.destroy()
+    
+    app.mainloop()
+    
+    # 確保程序完全退出
+    sys.exit(0)

@@ -136,10 +136,22 @@ class AsyncVideoFrameLoader:
         # load the rest of frames asynchronously without blocking the session start
         def _load_frames():
             try:
-                for n in tqdm(range(len(self.images)), desc="frame loading (JPEG)"):
+                # 停用 tqdm 進度條，使用簡單迴圈來避免 'NoneType' object has no attribute 'write' 錯誤
+                # for n in tqdm(range(len(self.images)), desc="frame loading (JPEG)"):
+                total_frames = len(self.images)
+                for n in range(total_frames):
+                    if n % 10 == 0:
+                        print(f"正在載入畫格: {n}/{total_frames}")
                     self.__getitem__(n)
+                print(f"所有畫格載入完成: {total_frames}/{total_frames}")
             except Exception as e:
-                self.exception = e
+                print(f"畫格載入發生錯誤: {e}")
+                # 發生錯誤時，使用普通迴圈繼續載入
+                for n in range(len(self.images)):
+                    try:
+                        self.__getitem__(n)
+                    except Exception:
+                        pass
 
         self.thread = Thread(target=_load_frames, daemon=True)
         self.thread.start()
@@ -265,8 +277,14 @@ def load_video_frames_from_jpg_images(
         return lazy_images, lazy_images.video_height, lazy_images.video_width
 
     images = torch.zeros(num_frames, 3, image_size, image_size, dtype=torch.float32)
-    for n, img_path in enumerate(tqdm(img_paths, desc="frame loading (JPEG)")):
+    # 停用 tqdm 進度條，改用簡單的打印
+    print(f"開始載入 {num_frames} 張畫格...")
+    for n, img_path in enumerate(img_paths):
         images[n], video_height, video_width = _load_img_as_tensor(img_path, image_size)
+        if n % 10 == 0:
+            print(f"已載入 {n}/{num_frames} 張畫格")
+    print(f"所有畫格載入完成: {num_frames}/{num_frames}")
+    
     if not offload_video_to_cpu:
         images = images.to(compute_device)
         img_mean = img_mean.to(compute_device)
