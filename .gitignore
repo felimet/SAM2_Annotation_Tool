@@ -1,0 +1,6 @@
+*.spec
+/dist
+/.env
+/build
+/.vscode
+/checkpoints/*.pt
