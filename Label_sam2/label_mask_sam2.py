@@ -62,7 +62,7 @@ def show_box(box, ax):
 
 
 # %%
-def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualization=False):
+def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, video_dir_path=None, show_visualization=False):
     """
     將遮罩轉換為物件ID圖像並儲存
     
@@ -70,6 +70,7 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
     out_mask_logits: 模型輸出的遮罩邏輯值
     ann_frame_dir: 目錄路徑
     ann_frame_idx: 當前處理的幀索引
+    video_dir_path: 影片畫格目錄路徑，用於獲取資料夾名稱
     show_visualization: 是否顯示視覺化結果 (預設: False)
     
     返回:
@@ -96,8 +97,14 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
         object_id = mask_idx + 1
         id_mask[binary_mask] = object_id
     
+    # 使用影片目錄名稱作為儲存資料夾名稱，而非固定的 "id_masks"
+    folder_name = "id_masks"  # 預設值
+    if video_dir_path:
+        # 從影片路徑中提取最後一個資料夾名稱
+        folder_name = os.path.basename(os.path.normpath(video_dir_path))
+    
     # 確保儲存目錄存在
-    save_dir = os.path.join(ann_frame_dir, "id_masks")
+    save_dir = os.path.join(ann_frame_dir, folder_name)
     os.makedirs(save_dir, exist_ok=True)
     
     # 儲存物件ID遮罩，檔案命名從 1 開始，而不是從 0 開始
@@ -117,11 +124,6 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
         plt.show()
     
     return id_mask, mask_path
-
-
-# %%
-%cd D:/Anycode/label-sam2
-
 
 # %%
 from sam2.build_sam import build_sam2_video_predictor
@@ -208,6 +210,7 @@ for out_frame_idx, out_obj_ids, out_mask_logits in predictor.propagate_in_video(
             out_mask_logits=out_mask_logits,
             ann_frame_dir=id_mask_path,
             ann_frame_idx=out_frame_idx,
+            video_dir_path=video_dir,
             show_visualization=False
         )
 

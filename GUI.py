@@ -133,7 +133,7 @@ def show_points_on_ax(coords, labels, ax, marker_size=50):
 # --- 遮罩儲存函數 ---
 
 
-def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualization=False):
+def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, video_dir_path=None, show_visualization=False):
     """
     將遮罩轉換為物件ID影像並儲存
 
@@ -141,6 +141,7 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
     out_mask_logits: 模型輸出的遮罩邏輯值 (Tensor list)
     ann_frame_dir: 目錄路徑
     ann_frame_idx: 當前處理的畫格索引
+    video_dir_path: 影片畫格目錄路徑，用於獲取資料夾名稱
     show_visualization: 是否顯示視覺化結果 (在此 GUI 中通常為 False)
 
     返回:
@@ -168,8 +169,14 @@ def save_id_mask(out_mask_logits, ann_frame_dir, ann_frame_idx, show_visualizati
             object_id = mask_idx + 1  # 物件 ID 從 1 開始
             id_mask[binary_mask] = object_id
 
+        # 使用影片目錄名稱作為儲存資料夾名稱，而非固定的 "id_masks"
+        folder_name = "id_masks"  # 預設值
+        if video_dir_path:
+            # 從影片路徑中提取最後一個資料夾名稱
+            folder_name = os.path.basename(os.path.normpath(video_dir_path))
+        
         # 確保儲存目錄存在
-        save_dir = os.path.join(ann_frame_dir, "id_masks")
+        save_dir = os.path.join(ann_frame_dir, folder_name)
         os.makedirs(save_dir, exist_ok=True)
 
         # 儲存物件ID遮罩，檔案命名從 1 開始，而不是從 0 開始
@@ -208,7 +215,7 @@ class SAM2_GUI(tk.Tk):
             value=resource_path(os.path.join("checkpoints", "sam2.1_hiera_large.pt")))  # 預設權重檔
         self.video_dir = tk.StringVar()
         self.output_dir = tk.StringVar(
-            value="./video_annotations")  # 預設輸出目錄
+            value="D:/SAM2_Annotation_Tool/video_annotations")  # 預設輸出目錄
         self.frame_names = []
         self.current_frame_index = tk.IntVar(value=0)
         self.predictor = None
@@ -1266,6 +1273,7 @@ class SAM2_GUI(tk.Tk):
                                     out_mask_logits=out_mask_logits,
                                     ann_frame_dir=output_path,
                                     ann_frame_idx=out_frame_idx,
+                                    video_dir_path=self.video_dir.get(),
                                     show_visualization=False
                                 )
 
