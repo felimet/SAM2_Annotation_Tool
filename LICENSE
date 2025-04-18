@@ -1,0 +1,38 @@
+# SAM2 標註工具授權
+
+Copyright (c) 2025 Jia-Ming Zhou
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-------------------------------------------------------------------
+
+# Apache License 2.0 授權說明
+
++ 自由使用：使用者可以自由地使用、修改和分發軟體，無論是商業還是非商業用途。
+
++ 專利授權：Apache License 2.0 提供了一個明確的專利授權，這意味著如果貢獻者對於其貢獻的代碼擁有專利權，則這些權利在使用者使用這些代碼時不會被主張。
+
++ 修改和再分發：使用者可以對軟體進行修改，並可以再分發修改過的版本，但必須在分發時附上原始授權條款，並且需在修改的版本中明確標示出所做的修改。
+
++ 商標使用：Apache License 2.0 並不授權使用 Apache 基金會的商標，使用者需要獲得特別的許可才能使用這些商標。
+
++ 無保證：此授權條款明確指出，軟體是以「現狀」提供的，並不提供任何形式的保證或擔保。
+
+-------------------------------------------------------------------
+
+# 基於 SAM2 模型的授權聲明
+
+本專案使用了 Meta AI 的 Segment Anything Model 2 (SAM2)，
+該模型的使用受到其原始授權的約束。
+
+SAM2 原始程式碼位於: https://github.com/facebookresearch/sam2
