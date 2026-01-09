@@ -79,7 +79,3 @@ print(torch.cuda.is_available())
 - 使用更小的模型（例如 sam2.1_hiera_tiny.pt 或 sam2.1_hiera_small.pt）
 - 減小處理的影像尺寸
 - 增加系統 RAM 或 GPU 記憶體
-
-## 技術支援
-
-如遇到任何問題，請在 GitHub 上提交 issue 或聯絡開發團隊。
